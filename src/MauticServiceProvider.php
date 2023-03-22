@@ -11,7 +11,15 @@ class MauticServiceProvider extends PackageServiceProvider
     {
         $package
             ->name('laravel-mautic')
-            ->hasConfigFile()
-            ->hasViews();
+            ->hasConfigFile('mautic')
+            ->hasViews()
+            ->hasRoute('web');
+    }
+
+    public function packageRegistered()
+    {
+        $this->app->singleton('laravel-mautic', function () {
+            return new Mautic();
+        });
     }
 }

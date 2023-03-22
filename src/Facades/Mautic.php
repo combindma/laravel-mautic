@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\Facade;
  */
 class Mautic extends Facade
 {
-    protected static function getFacadeAccessor()
+    protected static function getFacadeAccessor(): string
     {
-        return 'laravel-mautic';
+        return \Combindma\Mautic\Mautic::class;
     }
 }

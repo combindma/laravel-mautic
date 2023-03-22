@@ -34,6 +34,24 @@ Optionally, you can publish the views using
 php artisan vendor:publish --tag="laravel-mautic-views"
 ```
 
+## Mautic Setup
+The API must be enabled in Mautic.
+
+Within Mautic, go to the Configuration page (located in the Settings menu) and under API Settings enable Mautic's API.
+
+After saving the configuration, go to the API Credentials page (located in the Settings menu) and create a new client. 
+
+Enter the callback/redirect URI (Should be `https://your-domain.com/login/mautic/callback`). Click Apply, then copy the Client ID and Client Secret to the .env file.
+
+This is an example of .env file:
+
+```
+MAUTIC_BASE_URL="https://your-domain.com"
+MAUTIC_PUBLIC_KEY="XXXXXXXXXXXXXXXX"
+MAUTIC_SECRET_KEY="XXXXXXXXXX"
+MAUTIC_CALLBACK="https://your-domain.com/login/mautic/callback"
+```
+
 ## Usage
 
 ```php

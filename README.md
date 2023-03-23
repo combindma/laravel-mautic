@@ -90,9 +90,13 @@ For OAuth2 you need to create a `OAuth2` client in order to use the api.
 
 ## OAuth2 Mautic Setup
 The API must be enabled in Mautic.
+
 Within Mautic, go to the Configuration page (located in the Settings menu) and under API Settings enable Mautic's API.
+
 After saving the configuration, go to the API Credentials page (located in the Settings menu) and create a new client.
+
 Enter the callback/redirect URI (Should be `https://your-domain.com/integration/mautic`). Click Apply, then copy the Client ID and Client Secret to the .env file.
+
 This is an example of .env file:
 
 ```
@@ -100,19 +104,17 @@ MAUTIC_BASE_URL="https://your-domain.com"
 MAUTIC_PUBLIC_KEY="XXXXXXXXXXXXXXXX"
 MAUTIC_SECRET_KEY="XXXXXXXXXX"
 MAUTIC_CALLBACK="https://your-domain.com/integration/mautic"
-MAUTIC_USERNAME=email@email.com
-MAUTIC_PASSWORD=password
 ```
 
 ## BasicAuth Mautic Setup
-You need to add your `username` and `password` for BasicAuth:
+You need to add your `username` and `password` in .env file for BasicAuth:
 ```
 MAUTIC_USERNAME=email@email.com
 MAUTIC_PASSWORD=password
 ```
 
 ## Registering Application (Only OAuth2 Authentication)
-In order to register you application with mautic ping this url this is one time registration.
+In order to register you application with mautic ping this url one time to register your application.
 ```url
 https://your-domain.com/integration/mautic
 ```

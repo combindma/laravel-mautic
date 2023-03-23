@@ -7,12 +7,7 @@ use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return [
             MauticServiceProvider::class,
@@ -21,12 +16,17 @@ class TestCase extends Orchestra
 
     public function getEnvironmentSetUp($app)
     {
-        config()->set('database.default', 'testing');
-        config()->set('database.connections.testing', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
+        config()->set('app.locale', 'en');
+        config()->set('mautic', [
+            'version' => 'OAuth2',
+            'baseUrl' => 'http://mautic.domain.com',
+            'clientKey' => 'CLIENTKEY',
+            'clientSecret' => 'CLIENTSECRET',
+            'callback' => 'http://localhost/integration/mautic',
+            'username' => 'my-username',
+            'password' => 'MY_PASSWORD',
+            'apiEnabled' => true,
+            'fileName' => 'mautic.json',
         ]);
-        config()->set('app.locale', 'fr');
     }
 }

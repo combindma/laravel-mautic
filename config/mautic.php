@@ -2,6 +2,15 @@
 
 return [
     /*
+    |--------------------------------------------------------------------------
+    | Auth Type
+    |--------------------------------------------------------------------------
+    | Version of the auth can be OAuth2 or BasicAuth. OAuth2 is the default value.
+    |
+    */
+    'version' => 'OAuth2', //or BasicAuth
+
+    /*
      * Base URL of the Mautic instance
      */
     'baseUrl' => env('MAUTIC_BASE_URL'),
@@ -20,6 +29,18 @@ return [
      * Redirect URI/Callback URI for this script
      */
     'callback' => env('MAUTIC_CALLBACK'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Mautic App Credentials
+    |--------------------------------------------------------------------------
+    |
+    | This is used in case of BasicAuth
+    |
+    */
+    'username' => env('MAUTIC_USERNAME'),
+
+    'password' => env('MAUTIC_PASSWORD'),
 
     /*
     * Enable or disable Mautic. Useful for local development when running tests.

@@ -25,6 +25,56 @@ This is the contents of the published config file:
 
 ```php
 return [
+    /*
+    |--------------------------------------------------------------------------
+    | Auth Type
+    |--------------------------------------------------------------------------
+    | Version of the auth can be OAuth2 or BasicAuth. OAuth2 is the default value.
+    |
+    */
+    'version' => 'OAuth2', //or BasicAuth
+
+    /*
+     * Base URL of the Mautic instance
+     */
+    'baseUrl' => env('MAUTIC_BASE_URL'),
+
+    /*
+     * Client/Consumer key from Mautic
+     */
+    'clientKey' => env('MAUTIC_PUBLIC_KEY'),
+
+    /*
+     * Client/Consumer secret key from Mautic
+     */
+    'clientSecret' => env('MAUTIC_SECRET_KEY'),
+
+    /*
+     * Redirect URI/Callback URI for this script
+     */
+    'callback' => env('MAUTIC_CALLBACK'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Mautic App Credentials
+    |--------------------------------------------------------------------------
+    |
+    | This is used in case of BasicAuth
+    |
+    */
+    'username' => env('MAUTIC_USERNAME'),
+
+    'password' => env('MAUTIC_PASSWORD'),
+
+    /*
+    * Enable or disable Mautic. Useful for local development when running tests.
+    */
+    'apiEnabled' => env('MAUTIC_ENABLED', false),
+
+    /*
+    * Filename to use when storing mautic access token. Must be a json File
+    */
+    'fileName' => 'mautic.json',
 ];
 ```
 
@@ -34,30 +84,60 @@ Optionally, you can publish the views using
 php artisan vendor:publish --tag="laravel-mautic-views"
 ```
 
-## Mautic Setup
+## Authorization
+This Library only supports `OAuth2` and `BasicAuth` Authentication.
+For OAuth2 you need to create a `OAuth2` client in order to use the api.
+
+## OAuth2 Mautic Setup
 The API must be enabled in Mautic.
-
 Within Mautic, go to the Configuration page (located in the Settings menu) and under API Settings enable Mautic's API.
-
-After saving the configuration, go to the API Credentials page (located in the Settings menu) and create a new client. 
-
-Enter the callback/redirect URI (Should be `https://your-domain.com/login/mautic/callback`). Click Apply, then copy the Client ID and Client Secret to the .env file.
-
+After saving the configuration, go to the API Credentials page (located in the Settings menu) and create a new client.
+Enter the callback/redirect URI (Should be `https://your-domain.com/integration/mautic`). Click Apply, then copy the Client ID and Client Secret to the .env file.
 This is an example of .env file:
 
 ```
 MAUTIC_BASE_URL="https://your-domain.com"
 MAUTIC_PUBLIC_KEY="XXXXXXXXXXXXXXXX"
 MAUTIC_SECRET_KEY="XXXXXXXXXX"
-MAUTIC_CALLBACK="https://your-domain.com/login/mautic/callback"
+MAUTIC_CALLBACK="https://your-domain.com/integration/mautic"
+MAUTIC_USERNAME=email@email.com
+MAUTIC_PASSWORD=password
+```
+
+## BasicAuth Mautic Setup
+You need to add your `username` and `password` for BasicAuth:
+```
+MAUTIC_USERNAME=email@email.com
+MAUTIC_PASSWORD=password
+```
+
+## Registering Application (Only OAuth2 Authentication)
+In order to register you application with mautic ping this url this is one time registration.
+```url
+https://your-domain.com/integration/mautic
 ```
 
 ## Usage
 
 ```php
-$mautic = new Combindma\Mautic();
-echo $mautic->echoPhrase('Hello, Combindma!');
+use Combindma\Mautic\Facades\Mautic;
+
+Mautic::subscribe('email@gmail.com');
+
+//or
+$params = array(
+    'firstname' => 'bullet',
+    'lastname'  => 'proof',
+);
+Mautic::subscribe('email@gmail.com', $params);
+
+//create ContactApi to use it accordingly to Mautic documentation
+$contactApi = Mautic::contactApi();
+$contactApi->delete($id);
 ```
+
+Please refer to [Documentation](https://developer.mautic.org).
+for all customizable parameters.
 
 ## Testing
 

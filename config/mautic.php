@@ -8,7 +8,7 @@ return [
     | Version of the auth can be OAuth2 or BasicAuth. OAuth2 is the default value.
     |
     */
-    'version' => 'OAuth2', //or BasicAuth
+    'version' => env('MAUTIC_VERSION', 'OAuth2'), //or BasicAuth
 
     /*
      * Base URL of the Mautic instance

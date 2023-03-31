@@ -95,28 +95,31 @@ Within Mautic, go to the Configuration page (located in the Settings menu) and u
 
 After saving the configuration, go to the API Credentials page (located in the Settings menu) and create a new client.
 
-Enter the callback/redirect URI (Should be `https://your-domain.com/integration/mautic`). Click Apply, then copy the Client ID and Client Secret to the .env file.
+Enter the callback/redirect URI (Should be `https://your-domain.com/login/mautic/callback`). Click Apply, then copy the Client ID and Client Secret to the .env file.
 
 This is an example of .env file:
 
 ```
-MAUTIC_BASE_URL="https://your-domain.com"
+MAUTIC_VERSION="OAuth2"
+MAUTIC_BASE_URL="https://mautic-domain.com"
 MAUTIC_PUBLIC_KEY="XXXXXXXXXXXXXXXX"
 MAUTIC_SECRET_KEY="XXXXXXXXXX"
-MAUTIC_CALLBACK="https://your-domain.com/integration/mautic"
+MAUTIC_CALLBACK="https://your-domain.com/login/mautic/callback"
 ```
 
 ## BasicAuth Mautic Setup
 You need to add your `username` and `password` in .env file for BasicAuth:
 ```
-MAUTIC_USERNAME=email@email.com
-MAUTIC_PASSWORD=password
+MAUTIC_VERSION="BasicAuth"
+MAUTIC_BASE_URL="https://mautic-domain.com"
+MAUTIC_USERNAME="email@email.com"
+MAUTIC_PASSWORD="password"
 ```
 
 ## Registering Application (Only OAuth2 Authentication)
 In order to register you application with mautic ping this url one time to register your application.
 ```url
-https://your-domain.com/integration/mautic
+https://your-domain.com/login/mautic
 ```
 
 ## Usage
@@ -133,9 +136,11 @@ $params = array(
 );
 Mautic::subscribe('email@gmail.com', $params);
 
-//create ContactApi to use it accordingly to Mautic documentation
-$contactApi = Mautic::contactApi();
-$contactApi->delete($id);
+//Delete a contact
+Mautic::unsubscribe(567);//ID contact
+
+//build your request to use it accordingly to Mautic documentation
+$response = Mautic::buildRequest()?->get($this->endpoint.'contacts/'.$id);
 ```
 
 Please refer to [Documentation](https://developer.mautic.org).

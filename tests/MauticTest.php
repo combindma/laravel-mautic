@@ -14,39 +14,6 @@ it('can test if config file are set', function () {
         ->and($mautic->isApiEnabled())->toBeTrue();
 });
 
-it('can set construct settings according to the config file', function () {
-    $mautic = new Mautic();
-    expect($mautic->getSettings())->toBe([
-        'baseUrl' => 'http://mautic.domain.com',
-        'version' => 'OAuth2',
-        'clientKey' => 'CLIENTKEY',
-        'clientSecret' => 'CLIENTSECRET',
-        'callback' => 'http://localhost/integration/mautic',
-    ]);
-});
-
-it('can set construct settings with BasicAuth authentification version', function () {
-    config()->set('mautic.version', 'BasicAuth');
-    $mautic = new Mautic();
-    expect($mautic->getSettings())->toBe([
-        'userName' => 'my-username',
-        'password' => 'MY_PASSWORD',
-    ]);
-});
-
-it('can set new settings attributes', function () {
-    $mautic = new Mautic();
-    $mautic->setSettings(['key' => 'value']);
-    expect($mautic->getSettings())->toBe([
-        'baseUrl' => $mautic->getBaseUrl(),
-        'version' => 'OAuth2',
-        'clientKey' => $mautic->getClientKey(),
-        'clientSecret' => $mautic->getClientSecret(),
-        'callback' => $mautic->getCallback(),
-        'key' => 'value',
-    ]);
-});
-
 it('can disable api on the fly', function () {
     config()->set('mautic.apiEnabled', true);
     $mautic = new Mautic();

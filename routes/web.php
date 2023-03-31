@@ -10,4 +10,7 @@
 use Combindma\Mautic\Http\Controllers\MauticController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('integration/mautic', [MauticController::class, 'integration']);
+Route::group(['middleware' => ['web']], function () {
+    Route::get('login/mautic', [MauticController::class, 'login']);
+    Route::get('login/mautic/callback', [MauticController::class, 'callback']);
+});

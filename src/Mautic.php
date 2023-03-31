@@ -2,14 +2,17 @@
 
 namespace Combindma\Mautic;
 
+use Combindma\Mautic\Exceptions\UnableToGetMauticTokensException;
+use Combindma\Mautic\Exceptions\UnableToHandleCallbackMauticUrl;
 use Combindma\Mautic\Exceptions\UnableToStoreMauticDataException;
+use Combindma\Mautic\Exceptions\UnauthorizedStateIsReturned;
 use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
-use Mautic\Api\Api;
-use Mautic\Auth\ApiAuth;
-use Mautic\Exception\ContextNotFoundException;
-use Mautic\MauticApi;
 
 class Mautic
 {
@@ -29,11 +32,13 @@ class Mautic
 
     private readonly string $password;
 
-    private bool $apiEnabled;
+    private readonly string $apiUrl;
+
+    private string $endpoint;
 
     private readonly string $fileName;
 
-    private array $settings;
+    private bool $apiEnabled;
 
     public function __construct()
     {
@@ -44,9 +49,10 @@ class Mautic
         $this->callback = config('mautic.callback');
         $this->username = config('mautic.username');
         $this->password = config('mautic.password');
+        $this->apiUrl = $this->baseUrl.'/oauth/v2/';
+        $this->endpoint = $this->baseUrl.'/api/';
         $this->fileName = config('mautic.fileName');
         $this->apiEnabled = config('mautic.apiEnabled');
-        $this->initiateSettings();
     }
 
     public function getVersion(): string
@@ -94,34 +100,6 @@ class Mautic
         return $this->fileName;
     }
 
-    public function getSettings(): array
-    {
-        return $this->settings;
-    }
-
-    public function initiateSettings(): void
-    {
-        if ($this->version === 'OAuth2') {
-            $this->settings = [
-                'baseUrl' => $this->baseUrl,
-                'version' => 'OAuth2',
-                'clientKey' => $this->clientKey,
-                'clientSecret' => $this->clientSecret,
-                'callback' => $this->callback,
-            ];
-        } else {
-            $this->settings = [
-                'userName' => $this->getUsername(),
-                'password' => $this->getPassword(),
-            ];
-        }
-    }
-
-    public function setSettings(array $settings): void
-    {
-        $this->settings = array_merge($this->settings, $settings);
-    }
-
     public function disable(): void
     {
         $this->apiEnabled = false;
@@ -132,81 +110,97 @@ class Mautic
         $this->apiEnabled = true;
     }
 
-    protected function getMauticData()
+    //Obtain Authorization Code
+    public function authorize(): \Illuminate\Http\RedirectResponse
     {
-        return json_decode(Storage::disk('local')->get($this->getFileName()));
+        //The state is recommended to prevent CSRF attacks.
+        $state = md5(time().mt_rand());
+        //It should be a uniquely generated string and stored locally in session. to be compared with the returned value.
+        Session::put('mautic.oauth_state', $state);
+        $authUrl = $this->apiUrl.'authorize'.'?client_id='.$this->clientKey.'&redirect_uri='.urlencode($this->callback).'&state='.$state.'&response_type=code&grant_type=authorization_code';
+        //Redirect the user to the authorize endpoint oauth/v2/authorize:
+        return Redirect::away($authUrl);
     }
 
-    /**
-     * @throws UnableToStoreMauticDataException
-     * @throws ContextNotFoundException
-     */
-    public function contactApi(): ?Api
+    //Replace with an Access Token
+    public function requestToken(Request $request): void
     {
-        if (! $this->isApiEnabled()) {
-            return null;
+        $oauth_session = $request->session()->pull('mautic');
+
+        if (! $request->input('code') && ! $request->input('state')) {
+            throw new UnableToHandleCallbackMauticUrl();
         }
 
-        if ($this->getVersion() === 'OAuth2') {
-            $mautic = $this->authorizeApplication(false);
-            $this->setSettings([
-                'accessToken' => $mautic['access_token'],
-                'accessTokenExpires' => $mautic['expires'],
-                'refreshToken' => $mautic['refresh_token'],
-            ]);
-            $auth = (new ApiAuth())->newAuth($this->settings);
-        } else {
-            $initAuth = new ApiAuth();
-            $auth = $initAuth->newAuth($this->settings, 'BasicAuth');
+        if (empty($oauth_session)) {
+            throw new UnauthorizedStateIsReturned();
         }
 
-        return (new MauticApi())->newApi('contacts', $auth, $this->getBaseUrl());
+        if ($request->input('state') != $oauth_session['oauth_state']) {
+            throw new UnauthorizedStateIsReturned();
+        }
+
+        $response = Http::post($this->apiUrl.'token', [
+            'client_id' => $this->clientKey,
+            'client_secret' => $this->clientSecret,
+            'redirect_uri' => $this->callback,
+            'grant_type' => 'authorization_code',
+            'code' => $request->input('code'),
+        ]);
+
+        if ($response->failed()) {
+            Log::error('Mautic error: '.$response->body());
+        }
+
+        $this->storeAccessToken($response->json());
     }
 
+    //Refresh Tokens
+    private function refreshToken(): array
+    {
+        $response = Http::post($this->apiUrl.'token', [
+            'client_id' => $this->clientKey,
+            'client_secret' => $this->clientSecret,
+            'refresh_token' => $this->getAccessToken()['refresh_token'],
+            'redirect_uri' => $this->callback,
+            'grant_type' => 'refresh_token',
+        ]);
+
+        if ($response->failed()) {
+            Log::error('Mautic error: '.$response->body());
+            throw new Exception($response->body());
+        }
+
+        $this->storeAccessToken($response->json());
+
+        return $response->json();
+    }
+
+    //Store mautic data in local storage
+    private function storeAccessToken(array $accessToken): void
+    {
+        if (! Storage::disk('local')->put(config('mautic.fileName', 'mautic.json'), json_encode($accessToken))) {
+            throw new UnableToStoreMauticDataException();
+        }
+    }
+
+    //Get mautic data from local storage
     /*
-     * Handle authorization request
-     * */
-    public function authorizeApplication($redirect = true): ?array
+     * access_token
+     * expires_in
+     * refresh_token
+     */
+    private function getAccessToken(): array
     {
-        $mauticData = $this->getAccessTokenData($redirect);
-        // The file could not be written to disk...
-        if (! Storage::disk('local')->put(config('mautic.fileName'), json_encode($mauticData))) {
-            throw new UnableToStoreMauticDataException('Unable to store Mautic data.');
+        if ($accessToken = Storage::disk('local')->json($this->fileName)) {
+            return $accessToken;
         }
 
-        return (array) $mauticData;
+        throw new UnableToGetMauticTokensException();
     }
 
-    protected function getAccessTokenData($redirect = true): array
+    //Check AccessToken Expiration Time
+    private function checkExpirationTime($expireTimestamp): bool
     {
-        session_start();
-
-        $mautic = $this->getMauticData();
-
-        if (! empty($mautic)) {
-            $this->setSettings([
-                'accessToken' => $mautic->access_token,
-                'accessTokenExpires' => $mautic->expires,
-                'refreshToken' => $mautic->refresh_token,
-            ]);
-        }
-        // Initiate the auth object
-        $auth = (new ApiAuth())->newAuth($this->settings);
-
-        try {
-            //$auth->validateAccessToken() will redirect user to Mautic where he can authorize the app.
-            if ($auth->validateAccessToken($redirect)) {
-                // call accessTokenUpdated() to catch if the token was updated via a refresh token
-                if ($auth->accessTokenUpdated()) {
-                    // $accessTokenData will have the following keys: access_token, expires, token_type, refresh_token
-                    return $auth->getAccessTokenData();
-                }
-            }
-        } catch (Exception $e) {
-            Log::error($e);
-        }
-
-        //This app is already authorized.
-        return (array) $mautic;
+        return time() > time() + $expireTimestamp;
     }
 }

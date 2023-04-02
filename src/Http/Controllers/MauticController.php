@@ -17,7 +17,7 @@ class MauticController extends Controller
 
     public function callback(Request $request)
     {
-        if ($request->input('code') && ! $request->input('state')) {
+        if ($request->input('code') && $request->input('state')) {
             $authConnector = new MauticAuthConnector;
             $authConnector->requestToken($request);
         }

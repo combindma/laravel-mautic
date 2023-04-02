@@ -2,7 +2,7 @@
 
 namespace Combindma\Mautic\Http\Controllers;
 
-use Combindma\Mautic\Facades\Mautic;
+use Combindma\Mautic\MauticAuthConnector;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
@@ -10,12 +10,15 @@ class MauticController extends Controller
 {
     public function login()
     {
-        return Mautic::authorize();
+        $authConnector = new MauticAuthConnector;
+
+        return $authConnector->authorize();
     }
 
     public function callback(Request $request)
     {
-        Mautic::requestToken($request);
+        $authConnector = new MauticAuthConnector;
+        $authConnector->requestToken($request);
 
         return view('mautic::index');
     }

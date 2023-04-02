@@ -32,7 +32,7 @@ return [
     | Version of the auth can be OAuth2 or BasicAuth. OAuth2 is the default value.
     |
     */
-    'version' => 'OAuth2', //or BasicAuth
+    'version' => env('MAUTIC_VERSION', 'OAuth2'), //or BasicAuth
 
     /*
      * Base URL of the Mautic instance
@@ -95,7 +95,7 @@ Within Mautic, go to the Configuration page (located in the Settings menu) and u
 
 After saving the configuration, go to the API Credentials page (located in the Settings menu) and create a new client.
 
-Enter the callback/redirect URI (Should be `https://your-domain.com/login/mautic/callback`). Click Apply, then copy the Client ID and Client Secret to the .env file.
+Enter the callback/redirect URI (Should be `https://your-domain.com/integration/mautic/callback`). Click Apply, then copy the Client ID and Client Secret to the .env file.
 
 This is an example of .env file:
 
@@ -104,7 +104,7 @@ MAUTIC_VERSION="OAuth2"
 MAUTIC_BASE_URL="https://mautic-domain.com"
 MAUTIC_PUBLIC_KEY="XXXXXXXXXXXXXXXX"
 MAUTIC_SECRET_KEY="XXXXXXXXXX"
-MAUTIC_CALLBACK="https://your-domain.com/login/mautic/callback"
+MAUTIC_CALLBACK="https://your-domain.com/integration/mautic/callback"
 ```
 
 ## BasicAuth Mautic Setup
@@ -119,7 +119,7 @@ MAUTIC_PASSWORD="password"
 ## Registering Application (Only OAuth2 Authentication)
 In order to register you application with mautic ping this url one time to register your application.
 ```url
-https://your-domain.com/login/mautic
+https://your-domain.com/integration/mautic
 ```
 
 ## Usage
@@ -127,20 +127,17 @@ https://your-domain.com/login/mautic
 ```php
 use Combindma\Mautic\Facades\Mautic;
 
-Mautic::subscribe('email@gmail.com');
+Mautic::contacts()->create('email@gmail.com');
 
 //or
 $params = array(
     'firstname' => 'bullet',
     'lastname'  => 'proof',
 );
-Mautic::subscribe('email@gmail.com', $params);
+Mautic::contacts()->create('email@gmail.com', $params);
 
 //Delete a contact
-Mautic::unsubscribe(567);//ID contact
-
-//build your request to use it accordingly to Mautic documentation
-$response = Mautic::buildRequest()?->get($this->endpoint.'contacts/'.$id);
+Mautic::contacts()->delete(567);//ID contact
 ```
 
 Please refer to [Documentation](https://developer.mautic.org).

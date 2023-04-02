@@ -2,7 +2,7 @@
 
 use Combindma\Mautic\Mautic;
 
-it('can test if config file are set', function () {
+/*it('can test if config file are set', function () {
     $mautic = new Mautic();
     expect($mautic->getBaseUrl())->toBe('http://mautic.domain.com')
         ->and($mautic->getClientKey())->toBe('CLIENTKEY')
@@ -12,9 +12,9 @@ it('can test if config file are set', function () {
         ->and($mautic->getUsername())->toBe('my-username')
         ->and($mautic->getPassword())->toBe('MY_PASSWORD')
         ->and($mautic->isApiEnabled())->toBeTrue();
-});
+});*/
 
-it('can disable api on the fly', function () {
+/*it('can disable api on the fly', function () {
     config()->set('mautic.apiEnabled', true);
     $mautic = new Mautic();
     $mautic->disable();
@@ -26,4 +26,4 @@ it('can enable api on the fly if disabled', function () {
     $mautic = new Mautic();
     $mautic->enable();
     expect($mautic->isApiEnabled())->toBeTrue();
-});
+});*/

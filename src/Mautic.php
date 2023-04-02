@@ -8,10 +8,12 @@ use Saloon\Contracts\Authenticator;
 use Saloon\Http\Auth\BasicAuthenticator;
 use Saloon\Http\Auth\TokenAuthenticator;
 use Saloon\Http\Connector;
+use Saloon\Traits\Plugins\AlwaysThrowOnErrors;
 
 class Mautic extends Connector
 {
     use MauticStorage;
+    use AlwaysThrowOnErrors;
 
     private readonly string $version;
 
@@ -59,8 +61,8 @@ class Mautic extends Connector
         return new TokenAuthenticator($authenticator->getAccessToken());
     }
 
-    public function isApiEnabled(): bool
+    public function isApiDisabled(): bool
     {
-        return $this->apiEnabled;
+        return ! $this->apiEnabled;
     }
 }

@@ -10,23 +10,33 @@ use Saloon\Http\Response;
 
 class ContactResource extends Resource
 {
-    public function create(string $email, array $attributes = []): Response
+    public function create(string $email, array $attributes = []): ?Response
     {
+        if ($this->connector->isApiDisabled()) {
+            return null;
+        }
+
         try {
             return $this->connector->send(new CreateContactRequest($email, $attributes));
         } catch (Exception $e) {
             Log::error($e);
-            exit();
         }
+
+        return null;
     }
 
-    public function delete(int $id): Response
+    public function delete(int $id): ?Response
     {
+        if ($this->connector->isApiDisabled()) {
+            return null;
+        }
+
         try {
             return $this->connector->send(new DeleteContactRequest($id));
         } catch (Exception $e) {
             Log::error($e);
-            exit();
         }
+
+        return null;
     }
 }

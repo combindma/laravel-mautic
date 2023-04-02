@@ -22,7 +22,7 @@ class TestCase extends Orchestra
             'baseUrl' => 'http://mautic.domain.com',
             'clientKey' => 'CLIENTKEY',
             'clientSecret' => 'CLIENTSECRET',
-            'callback' => 'http://localhost/integration/mautic',
+            'callback' => 'http://localhost/integration/mautic/callback',
             'username' => 'my-username',
             'password' => 'MY_PASSWORD',
             'apiEnabled' => true,

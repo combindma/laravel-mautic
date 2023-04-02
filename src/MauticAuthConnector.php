@@ -2,7 +2,6 @@
 
 namespace Combindma\Mautic;
 
-use Combindma\Mautic\Exceptions\UnableToHandleCallbackMauticUrl;
 use Combindma\Mautic\Traits\MauticStorage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -62,9 +61,6 @@ class MauticAuthConnector extends Connector
 
     public function requestToken(Request $request): void
     {
-        if (! $request->input('code') && ! $request->input('state')) {
-            throw new UnableToHandleCallbackMauticUrl();
-        }
         $oauth_session = $request->session()->pull('mautic');
         $authenticator = $this->getAccessToken($request->input('code'), $request->input('state'), $oauth_session['oauth_state']);
         $this->storeToken($authenticator);

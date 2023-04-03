@@ -3,6 +3,7 @@
 namespace Combindma\Mautic;
 
 use Combindma\Mautic\Resources\ContactResource;
+use Combindma\Mautic\Resources\SegmentResource;
 use Combindma\Mautic\Traits\MauticStorage;
 use Saloon\Contracts\Authenticator;
 use Saloon\Http\Auth\BasicAuthenticator;
@@ -42,6 +43,11 @@ class Mautic extends Connector
     public function contacts(): ContactResource
     {
         return new ContactResource($this);
+    }
+
+    public function segments(): SegmentResource
+    {
+        return new SegmentResource($this);
     }
 
     protected function defaultAuth(): ?Authenticator

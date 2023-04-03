@@ -101,10 +101,10 @@ This is an example of .env file:
 
 ```
 MAUTIC_VERSION="OAuth2"
-MAUTIC_BASE_URL="https://mautic-domain.com"
-MAUTIC_PUBLIC_KEY="XXXXXXXXXXXXXXXX"
-MAUTIC_SECRET_KEY="XXXXXXXXXX"
-MAUTIC_CALLBACK="https://your-domain.com/integration/mautic/callback"
+MAUTIC_BASE_URL=https://mautic-domain.com
+MAUTIC_PUBLIC_KEY=XXXXXXXXXXXXXXXX
+MAUTIC_SECRET_KEY=XXXXXXXXXX
+MAUTIC_CALLBACK=https://your-domain.com/integration/mautic/callback
 MAUTIC_ENABLED=true
 ```
 
@@ -112,9 +112,9 @@ MAUTIC_ENABLED=true
 You need to add your `username` and `password` in .env file for BasicAuth:
 ```
 MAUTIC_VERSION="BasicAuth"
-MAUTIC_BASE_URL="https://mautic-domain.com"
-MAUTIC_USERNAME="email@email.com"
-MAUTIC_PASSWORD="password"
+MAUTIC_BASE_URL=https://mautic-domain.com
+MAUTIC_USERNAME=email@email.com
+MAUTIC_PASSWORD=password
 MAUTIC_ENABLED=true
 ```
 
@@ -129,9 +129,10 @@ https://your-domain.com/integration/mautic
 ```php
 use Combindma\Mautic\Facades\Mautic;
 
+//Create a new contact
 Mautic::contacts()->create('email@gmail.com');
 
-//or
+//with $parameters
 $params = array(
     'firstname' => 'bullet',
     'lastname'  => 'proof',
@@ -140,6 +141,17 @@ Mautic::contacts()->create('email@gmail.com', $params);
 
 //Delete a contact
 Mautic::contacts()->delete(567);//ID contact
+
+//Add contact to a segment
+Mautic::segments()->addContact($segmentId, $contactId);
+
+//Create a contact and add it to a segment
+$response = Mautic::contacts()->create(strtolower($request->input('email')));
+if (!$response->failed())
+{
+    $contactId = $response->object()->contact->id;
+    Mautic::segments()->addContact(4, $contactId);//4 is the segment ID, change it to your needs
+}
 ```
 
 Please refer to [Documentation](https://developer.mautic.org).

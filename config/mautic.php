@@ -13,22 +13,22 @@ return [
     /*
      * Base URL of the Mautic instance
      */
-    'baseUrl' => env('MAUTIC_BASE_URL'),
+    'baseUrl' => env('MAUTIC_BASE_URL', ''),
 
     /*
      * Client/Consumer key from Mautic
      */
-    'clientKey' => env('MAUTIC_PUBLIC_KEY'),
+    'clientKey' => env('MAUTIC_PUBLIC_KEY', ''),
 
     /*
      * Client/Consumer secret key from Mautic
      */
-    'clientSecret' => env('MAUTIC_SECRET_KEY'),
+    'clientSecret' => env('MAUTIC_SECRET_KEY', ''),
 
     /*
      * Redirect URI/Callback URI for this script
      */
-    'callback' => env('MAUTIC_CALLBACK'),
+    'callback' => env('MAUTIC_CALLBACK', ''),
 
     /*
     |--------------------------------------------------------------------------
@@ -38,9 +38,9 @@ return [
     | This is used in case of BasicAuth
     |
     */
-    'username' => env('MAUTIC_USERNAME'),
+    'username' => env('MAUTIC_USERNAME', ''),
 
-    'password' => env('MAUTIC_PASSWORD'),
+    'password' => env('MAUTIC_PASSWORD', ''),
 
     /*
     * Enable or disable Mautic. Useful for local development when running tests.

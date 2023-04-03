@@ -105,6 +105,7 @@ MAUTIC_BASE_URL="https://mautic-domain.com"
 MAUTIC_PUBLIC_KEY="XXXXXXXXXXXXXXXX"
 MAUTIC_SECRET_KEY="XXXXXXXXXX"
 MAUTIC_CALLBACK="https://your-domain.com/integration/mautic/callback"
+MAUTIC_ENABLED=true
 ```
 
 ## BasicAuth Mautic Setup
@@ -114,6 +115,7 @@ MAUTIC_VERSION="BasicAuth"
 MAUTIC_BASE_URL="https://mautic-domain.com"
 MAUTIC_USERNAME="email@email.com"
 MAUTIC_PASSWORD="password"
+MAUTIC_ENABLED=true
 ```
 
 ## Registering Application (Only OAuth2 Authentication)

@@ -126,6 +126,8 @@ https://your-domain.com/integration/mautic
 
 ## Usage
 
+#### Managing Contacts
+When working with Contact API, the IpAddress and lastActive parameters are added by default, so that you don't have to include them.
 ```php
 use Combindma\Mautic\Facades\Mautic;
 
@@ -139,8 +141,16 @@ $params = array(
 );
 Mautic::contacts()->create('email@gmail.com', $params);
 
+//Edit a given contact
+Mautic::contacts()->edit($contactId, $params);
+
 //Delete a contact
-Mautic::contacts()->delete(567);//ID contact
+Mautic::contacts()->delete(567);//567 is the contact ID, change it to your needs
+```
+
+#### Managing Contacts with segment
+```php
+use Combindma\Mautic\Facades\Mautic;
 
 //Add contact to a segment
 Mautic::segments()->addContact($segmentId, $contactId);
@@ -152,7 +162,36 @@ if (!$response->failed())
     $contactId = $response->object()->contact->id;
     Mautic::segments()->addContact(4, $contactId);//4 is the segment ID, change it to your needs
 }
+
+//Remove a contact from a given segment
+Mautic::segments()->removeContact($segmentId, $contactId);
 ```
+
+#### Managing Contacts with UTM Tags
+```php
+use Combindma\Mautic\Facades\Mautic;
+
+//Add UTM tags to a given contact
+$data = array(
+    'utm_campaign' => 'apicampaign',
+    'utm_source'   => 'fb',
+    'utm_medium'   => 'social',
+    'utm_content'  => 'fbad',
+    'utm_term'     => 'mautic api',
+    'useragent'    => 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0',
+    'url'          => '/product/fbad01/',
+    'referer'      => 'https://google.com/q=mautic+api',
+    'query'        => ['cid'=>'abc','cond'=>'new'], // or as string with "cid=abc&cond=new"
+    'remotehost'   => 'example.com',
+    'lastActive'   => '2017-01-17T00:30:08+00:00'
+ );
+ 
+Mautic::utmTags()->addUtmTag($contactId, $data);
+
+//Remove a given UTM Tag from contact
+Mautic::utmTags()->removeUtmTag($utmId, $contactId);
+```
+
 
 #### Macrobale
 Communicating with the API can become a repetitive process. that's why we made this package macroable.

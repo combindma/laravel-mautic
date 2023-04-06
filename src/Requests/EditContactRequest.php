@@ -7,26 +7,25 @@ use Saloon\Enums\Method;
 use Saloon\Http\Request;
 use Saloon\Traits\Body\HasJsonBody;
 
-class CreateContactRequest extends Request implements HasBody
+class EditContactRequest extends Request implements HasBody
 {
     use HasJsonBody;
 
-    protected Method $method = Method::POST;
+    protected Method $method = Method::PUT;
 
-    public function __construct(protected string $email, protected array $attributes = [])
+    public function __construct(protected int $contactId, protected array $attributes)
     {
         //
     }
 
     public function resolveEndpoint(): string
     {
-        return '/contacts/new';
+        return '/contacts/'.$this->contactId.'/edit';
     }
 
     protected function defaultBody(): array
     {
         return [
-            'email' => $this->email,
             'ipAddress' => request()->ip(),
             'lastActive' => now('UTC')->format('Y-m-d H:m:i'),
             ...$this->attributes,

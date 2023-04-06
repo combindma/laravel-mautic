@@ -154,6 +154,26 @@ if (!$response->failed())
 }
 ```
 
+#### Macrobale
+Communicating with the API can become a repetitive process. that's why we made this package macroable.
+
+```php
+use Combindma\Mautic\Facades\Mautic;
+
+//include this in your macrobale file
+Mautic::macro('subscribe', function(string $email) {
+    $response = Mautic::contacts()->create(strtolower($request->input('email')));
+    if (!$response->failed())
+    {
+        $contactId = $response->object()->contact->id;
+        Mautic::segments()->addContact(4, $contactId);//4 is the segment ID, change it to your needs
+    }
+});
+
+//In your controller, you only need to call your method
+Mautic::sbscribe('email@email.com');
+```
+
 Please refer to [Documentation](https://developer.mautic.org).
 for all customizable parameters.
 

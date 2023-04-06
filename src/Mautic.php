@@ -5,6 +5,7 @@ namespace Combindma\Mautic;
 use Combindma\Mautic\Resources\ContactResource;
 use Combindma\Mautic\Resources\SegmentResource;
 use Combindma\Mautic\Traits\MauticStorage;
+use Illuminate\Support\Traits\Macroable;
 use Saloon\Contracts\Authenticator;
 use Saloon\Http\Auth\BasicAuthenticator;
 use Saloon\Http\Auth\TokenAuthenticator;
@@ -15,6 +16,7 @@ class Mautic extends Connector
 {
     use MauticStorage;
     use AlwaysThrowOnErrors;
+    use Macroable;
 
     private readonly string $version;
 

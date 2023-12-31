@@ -16,7 +16,7 @@ class MauticServiceProvider extends PackageServiceProvider
             ->hasRoute('web');
     }
 
-    public function packageRegistered()
+    public function packageRegistered(): void
     {
         $this->app->singleton('laravel-mautic', function () {
             return new Mautic();

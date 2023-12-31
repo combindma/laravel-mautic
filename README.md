@@ -157,7 +157,7 @@ Mautic::segments()->addContact($segmentId, $contactId);
 
 //Create a contact and add it to a segment
 $response = Mautic::contacts()->create(strtolower($request->input('email')));
-if (!$response->failed())
+if ($response && !$response->failed())
 {
     $contactId = $response->object()->contact->id;
     Mautic::segments()->addContact(4, $contactId);//4 is the segment ID, change it to your needs
@@ -192,6 +192,25 @@ Mautic::utmTags()->addUtmTag($contactId, $data);
 Mautic::utmTags()->removeUtmTag($utmId, $contactId);
 ```
 
+#### Managing Contacts points
+```php
+use Combindma\Mautic\Facades\Mautic;
+
+//Add contact points
+$data = array(
+    'eventName' => 'Score via api',
+    'actionName' => 'Adding',
+ );
+ 
+Mautic::points()->addPoints($contactId, 10, $data);//$data is optional
+
+//Subtract contact points
+$data = array(
+    'eventname' => 'Score via api',
+    'actionname' => 'Subtracting',
+ );
+Mautic::points()->subtractPoints($contactId, 10, $data);//$data is optional
+```
 
 #### Macrobale
 Communicating with the API can become a repetitive process. that's why we made this package macroable.
@@ -202,7 +221,7 @@ use Combindma\Mautic\Facades\Mautic;
 //include this in your macrobale file
 Mautic::macro('subscribe', function(string $email) {
     $response = Mautic::contacts()->create(strtolower($request->input('email')));
-    if (!$response->failed())
+    if ($response && !$response->failed())
     {
         $contactId = $response->object()->contact->id;
         Mautic::segments()->addContact(4, $contactId);//4 is the segment ID, change it to your needs

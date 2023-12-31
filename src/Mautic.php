@@ -3,6 +3,7 @@
 namespace Combindma\Mautic;
 
 use Combindma\Mautic\Resources\ContactResource;
+use Combindma\Mautic\Resources\PointsResource;
 use Combindma\Mautic\Resources\SegmentResource;
 use Combindma\Mautic\Resources\UtmResource;
 use Combindma\Mautic\Traits\MauticStorage;
@@ -15,9 +16,9 @@ use Saloon\Traits\Plugins\AlwaysThrowOnErrors;
 
 class Mautic extends Connector
 {
-    use MauticStorage;
     use AlwaysThrowOnErrors;
     use Macroable;
+    use MauticStorage;
 
     private readonly string $version;
 
@@ -56,6 +57,11 @@ class Mautic extends Connector
     public function utmTags(): UtmResource
     {
         return new UtmResource($this);
+    }
+
+    public function points(): PointsResource
+    {
+        return new PointsResource($this);
     }
 
     protected function defaultAuth(): ?Authenticator
